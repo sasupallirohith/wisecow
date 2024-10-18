@@ -20,7 +20,7 @@ jobs:
         distribution: 'temurin'
 
     - name: Build with Maven
-      run: mvn clean package
+      run: mvn clean package || exit 1
       # Adjust the working directory if pom.xml is not in the root folder
 
     - name: Set up Docker Buildx
@@ -61,15 +61,15 @@ jobs:
         echo "    token: ${{ secrets.KUBE_TOKEN }}" >> $HOME/.kube/config
 
     - name: Verify kubectl context
-      run: kubectl config get-contexts  # This verifies the kubectl context
+      run: kubectl config get-contexts || exit 1  # This verifies the kubectl context
 
     - name: Check Kubernetes access
-      run: kubectl cluster-info  # This ensures Kubernetes is accessible from the runner
+      run: kubectl cluster-info || exit 1  # This ensures Kubernetes is accessible from the runner
 
     - name: List Kubernetes nodes
-      run: kubectl get nodes  # Verifies node accessibility in the Kubernetes cluster
+      run: kubectl get nodes || exit 1  # Verifies node accessibility in the Kubernetes cluster
 
     - name: Deploy to Kubernetes
       run: |
-        kubectl apply -f k8s/wisecow-deployment.yaml --validate=false
-        kubectl apply -f k8s/wisecow-service.yaml --validate=false
+        kubectl apply -f k8s/wisecow-deployment.yaml --validate=false || exit 1
+        kubectl apply -f k8s/wisecow-service.yaml --validate=false || exit 1
