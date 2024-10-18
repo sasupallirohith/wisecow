@@ -52,9 +52,13 @@ jobs:
         echo "contexts:" >> $HOME/.kube/config
         echo "- context:" >> $HOME/.kube/config
         echo "    cluster: docker-desktop" >> $HOME/.kube/config
-        echo "    user: docker-desktop" >> $HOME/.kube/config
+        echo "    user: ci-cd-service-account" >> $HOME/.kube/config
         echo "  name: docker-desktop" >> $HOME/.kube/config
         echo "current-context: docker-desktop" >> $HOME/.kube/config
+        echo "users:" >> $HOME/.kube/config
+        echo "- name: ci-cd-service-account" >> $HOME/.kube/config
+        echo "  user:" >> $HOME/.kube/config
+        echo "    token: ${{ secrets.KUBE_TOKEN }}" >> $HOME/.kube/config
 
     - name: Verify kubectl context
       run: kubectl config get-contexts  # This verifies the kubectl context
