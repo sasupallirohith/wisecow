@@ -10,66 +10,68 @@ jobs:
     runs-on: self-hosted  # Use the self-hosted runner
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Set up JDK
-      uses: actions/setup-java@v2
-      with:
-        java-version: '11'
-        distribution: 'temurin'
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'temurin'
 
-    - name: Build with Maven
-      run: mvn clean package || exit 1
-      # Adjust the working directory if pom.xml is not in the root folder
+      - name: Build with Maven
+        run: mvn clean package || exit 1
+        # Adjust the working directory if pom.xml is not in the root folder
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
 
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-    - name: Build and push Docker image
-      uses: docker/build-push-action@v2
-      with:
-        context: .
-        file: Dockerfile
-        push: true
-        tags: rohithsasupalli12/wisecow:latest
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: rohithsasupalli12/wisecow:latest
 
-    - name: Set up Kubeconfig
-      run: |
-        mkdir -p $HOME/.kube
-        echo "apiVersion: v1" > $HOME/.kube/config
-        echo "clusters:" >> $HOME/.kube/config
-        echo "- cluster:" >> $HOME/.kube/config
-        echo "    server: https://kubernetes.docker.internal:6443" >> $HOME/.kube/config
-        echo "    insecure-skip-tls-verify: true" >> $HOME/.kube/config
-        echo "  name: docker-desktop" >> $HOME/.kube/config
-        echo "contexts:" >> $HOME/.kube/config
-        echo "- context:" >> $HOME/.kube/config
-        echo "    cluster: docker-desktop" >> $HOME/.kube/config
-        echo "    user: ci-cd-service-account" >> $HOME/.kube/config
-        echo "  name: docker-desktop" >> $HOME/.kube/config
-        echo "current-context: docker-desktop" >> $HOME/.kube/config
-        echo "users:" >> $HOME/.kube/config
-        echo "- name: ci-cd-service-account" >> $HOME/.kube/config
-        echo "  user:" >> $HOME/.kube/config
-        echo "    token: ${{ secrets.KUBE_TOKEN }}" >> $HOME/.kube/config
+      - name: Set up Kubeconfig
+        run: |
+          mkdir -p $HOME/.kube
+          cat <<EOF > $HOME/.kube/config
+          apiVersion: v1
+          clusters:
+          - cluster:
+              server: https://kubernetes.docker.internal:6443
+              insecure-skip-tls-verify: true
+            name: docker-desktop
+          contexts:
+          - context:
+              cluster: docker-desktop
+              user: ci-cd-service-account
+            name: docker-desktop
+          current-context: docker-desktop
+          users:
+          - name: ci-cd-service-account
+            user:
+              token: ${{ secrets.KUBE_TOKEN }}
+          EOF
 
-    - name: Verify kubectl context
-      run: kubectl config get-contexts || exit 1  # This verifies the kubectl context
+      - name: Verify kubectl context
+        run: kubectl config get-contexts || exit 1  # This verifies the kubectl context
 
-    - name: Check Kubernetes access
-      run: kubectl cluster-info || exit 1  # This ensures Kubernetes is accessible from the runner
+      - name: Check Kubernetes access
+        run: kubectl cluster-info || exit 1  # This ensures Kubernetes is accessible from the runner
 
-    - name: List Kubernetes nodes
-      run: kubectl get nodes || exit 1  # Verifies node accessibility in the Kubernetes cluster
+      - name: List Kubernetes nodes
+        run: kubectl get nodes || exit 1  # Verifies node accessibility in the Kubernetes cluster
 
-    - name: Deploy to Kubernetes
-      run: |
-        kubectl apply -f k8s/wisecow-deployment.yaml --validate=false || exit 1
-        kubectl apply -f k8s/wisecow-service.yaml --validate=false || exit 1
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl apply -f k8s/wisecow-deployment.yaml --validate=false || exit 1
+          kubectl apply -f k8s/wisecow-service.yaml --validate=false || exit 1
