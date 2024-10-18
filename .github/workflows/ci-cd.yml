@@ -63,15 +63,23 @@ jobs:
           EOF
 
       - name: Verify kubectl context
-        run: kubectl config get-contexts || exit 1  # This verifies the kubectl context
+        run: kubectl config get-contexts || exit 1
 
       - name: Check Kubernetes access
-        run: kubectl cluster-info || exit 1  # This ensures Kubernetes is accessible from the runner
+        run: kubectl cluster-info || exit 1
 
       - name: List Kubernetes nodes
-        run: kubectl get nodes || exit 1  # Verifies node accessibility in the Kubernetes cluster
+        run: kubectl get nodes || exit 1
+
+      - name: Create TLS Secret in Kubernetes
+        run: |
+          kubectl create secret tls wisecow-tls \
+          --cert=$HOME/.secrets/tls.crt --key=$HOME/.secrets/tls.key || exit 1
+        env:
+          TLS_CERT_PATH: ${{ secrets.TLS_CERT_PATH }}  # TLS certificate path
+          TLS_KEY_PATH: ${{ secrets.TLS_KEY_PATH }}    # TLS private key path
 
       - name: Deploy to Kubernetes
         run: |
-          kubectl apply -f k8s/wisecow-deployment.yaml --validate=false || exit 1
-          kubectl apply -f k8s/wisecow-service.yaml --validate=false || exit 1
+          kubectl apply -f k8s/wisecow-deployment.yaml --force --validate=false || exit 1
+          kubectl apply -f k8s/wisecow-service.yaml --force --validate=false || exit 1
