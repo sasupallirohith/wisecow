@@ -74,10 +74,7 @@ jobs:
       - name: Create TLS Secret in Kubernetes
         run: |
           kubectl create secret tls wisecow-tls \
-          --cert=$HOME/.secrets/tls.crt --key=$HOME/.secrets/tls.key || exit 1
-        env:
-          TLS_CERT_PATH: ${{ secrets.TLS_CERT_PATH }}  # TLS certificate path
-          TLS_KEY_PATH: ${{ secrets.TLS_KEY_PATH }}    # TLS private key path
+          --cert=${{ secrets.TLS_CERT_PATH }} --key=${{ secrets.TLS_KEY_PATH }} || exit 1
 
       - name: Deploy to Kubernetes
         run: |
