@@ -64,7 +64,7 @@ jobs:
               token: ${{ secrets.KUBE_TOKEN }}
           EOF
 
-      - name: Verify kubectl context
+      - name: Verify kubectl context 
         run: kubectl config get-contexts || exit 1
 
       - name: Check Kubernetes access
