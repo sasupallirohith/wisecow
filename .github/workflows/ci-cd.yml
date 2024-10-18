@@ -41,9 +41,20 @@ jobs:
         tags: rohithsasupalli12/wisecow:latest
 
     - name: Set up Kubeconfig
-      uses: azure/setup-kubectl@v1
-      with:
-        version: 'latest'
+      run: |
+        mkdir -p $HOME/.kube
+        echo "apiVersion: v1" > $HOME/.kube/config
+        echo "clusters:" >> $HOME/.kube/config
+        echo "- cluster:" >> $HOME/.kube/config
+        echo "    server: https://kubernetes.docker.internal:6443" >> $HOME/.kube/config
+        echo "    insecure-skip-tls-verify: true" >> $HOME/.kube/config
+        echo "  name: docker-desktop" >> $HOME/.kube/config
+        echo "contexts:" >> $HOME/.kube/config
+        echo "- context:" >> $HOME/.kube/config
+        echo "    cluster: docker-desktop" >> $HOME/.kube/config
+        echo "    user: docker-desktop" >> $HOME/.kube/config
+        echo "  name: docker-desktop" >> $HOME/.kube/config
+        echo "current-context: docker-desktop" >> $HOME/.kube/config
 
     - name: Verify kubectl context
       run: kubectl config get-contexts  # This verifies the kubectl context
