@@ -72,7 +72,7 @@ jobs:
         run: kubectl config get-contexts
 
       - name: Check Kubernetes access
-        run: kubectl cluster-info
+        run: kubectl cluster-info --v=8
 
       - name: List Kubernetes nodes
         run: kubectl get nodes
