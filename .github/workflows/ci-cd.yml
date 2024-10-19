@@ -43,23 +43,28 @@ jobs:
 
       - name: Set up Kubeconfig
         run: |
-          mkdir -p $HOME/.kube
-          echo "apiVersion: v1" > $HOME/.kube/config
-          echo "clusters:" >> $HOME/.kube/config
-          echo "- cluster:" >> $HOME/.kube/config
-          echo "    server: https://kubernetes.docker.internal:6443" >> $HOME/.kube/config
-          echo "    insecure-skip-tls-verify: true" >> $HOME/.kube/config
-          echo "  name: docker-desktop" >> $HOME/.kube/config
-          echo "contexts:" >> $HOME/.kube/config
-          echo "- context:" >> $HOME/.kube/config
-          echo "    cluster: docker-desktop" >> $HOME/.kube/config
-          echo "    user: ci-cd-service-account" >> $HOME/.kube/config
-          echo "  name: docker-desktop" >> $HOME/.kube/config
-          echo "current-context: docker-desktop" >> $HOME/.kube/config
-          echo "users:" >> $HOME/.kube/config
-          echo "- name: ci-cd-service-account" >> $HOME/.kube/config
-          echo "  user:" >> $HOME/.kube/config
-          echo "    token: ${{ secrets.KUBE_TOKEN }}" >> $HOME/.kube/config
+          if (!(Test-Path -Path "$HOME/.kube")) {
+            New-Item -ItemType Directory -Path "$HOME/.kube"
+          }
+          $configContent = @"
+apiVersion: v1
+clusters:
+- cluster:
+    server: https://kubernetes.docker.internal:6443
+    insecure-skip-tls-verify: true
+  name: docker-desktop
+contexts:
+- context:
+    cluster: docker-desktop
+    user: ci-cd-service-account
+  name: docker-desktop
+current-context: docker-desktop
+users:
+- name: ci-cd-service-account
+  user:
+    token: ${{ secrets.KUBE_TOKEN }}
+"@
+          $configContent | Set-Content -Path "$HOME/.kube/config"
 
       - name: Verify kubectl context
         run: |
