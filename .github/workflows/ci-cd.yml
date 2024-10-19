@@ -84,3 +84,4 @@ EOF
           if [ $? -ne 0 ]; then exit 1; fi
           kubectl apply -f k8s/wisecow-service.yaml --validate=false
           if [ $? -ne 0 ]; then exit 1; fi
+ 
