@@ -63,7 +63,7 @@ current-context: docker-desktop
 users:
 - name: ci-cd-service-account
   user:
-    token: ${{ secrets.KUBE_TOKEN }}
+    token: ${{ secrets.KUBE_TOKEN }} 
 EOF
 
       - name: Verify kubectl context
