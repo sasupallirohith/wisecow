@@ -43,10 +43,10 @@ jobs:
 
       - name: Set up Kubeconfig
         run: |
-          if (!(Test-Path -Path "$HOME/.kube")) {
-            New-Item -ItemType Directory -Path "$HOME/.kube"
+          if (-not (Test-Path -Path "$HOME\.kube")) {
+            New-Item -ItemType Directory -Path "$HOME\.kube"
           }
-          $config = @"
+          $kubeConfig = @"
 apiVersion: v1
 clusters:
 - cluster:
@@ -64,7 +64,7 @@ users:
   user:
     token: ${{ secrets.KUBE_TOKEN }}
 "@
-          $config | Out-File -FilePath "$HOME/.kube/config" -Encoding utf8
+          $kubeConfig | Set-Content -Path "$HOME\.kube\config"
 
       - name: Verify kubectl context
         run: |
