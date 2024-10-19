@@ -6,7 +6,7 @@ on:
       - master
 
 jobs:
-  build: 
+  build:  
     runs-on: self-hosted  # Use the self-hosted runner
 
     steps:
