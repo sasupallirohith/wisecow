@@ -26,6 +26,9 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
+        with:
+          install: true  # Ensure Buildx is installed
+          use: true      # Use Buildx as the current builder
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
@@ -45,23 +48,23 @@ jobs:
         run: |
           mkdir -p $HOME/.kube
           cat <<EOF > $HOME/.kube/config
-          apiVersion: v1
-          clusters:
-          - cluster:
-              server: https://kubernetes.docker.internal:6443
-              insecure-skip-tls-verify: true
-            name: docker-desktop
-          contexts:
-          - context:
-              cluster: docker-desktop
-              user: ci-cd-service-account
-            name: docker-desktop
-          current-context: docker-desktop
-          users:
-          - name: ci-cd-service-account
-            user:
-              token: ${{ secrets.KUBE_TOKEN }}
-          EOF
+apiVersion: v1
+clusters:
+- cluster:
+    server: https://kubernetes.docker.internal:6443
+    insecure-skip-tls-verify: true
+  name: docker-desktop
+contexts:
+- context:
+    cluster: docker-desktop
+    user: ci-cd-service-account
+  name: docker-desktop
+current-context: docker-desktop
+users:
+- name: ci-cd-service-account
+  user:
+    token: ${{ secrets.KUBE_TOKEN }}
+EOF
 
       - name: Verify kubectl context
         run: |
