@@ -4,7 +4,7 @@ on:
   push:
     branches: 
       - master
- 
+
 jobs:
   build: 
     runs-on: self-hosted  # Use the self-hosted runner
@@ -43,7 +43,6 @@ jobs:
 
       - name: Set up Kubeconfig
         run: |
-          $kubeConfigPath = "$HOME/.kube/config"
           if (!(Test-Path -Path "$HOME/.kube")) {
             New-Item -ItemType Directory -Path "$HOME/.kube"
           }
@@ -65,7 +64,7 @@ users:
   user:
     token: ${{ secrets.KUBE_TOKEN }}
 "@
-          Set-Content -Path $kubeConfigPath -Value $config
+          $config | Out-File -FilePath "$HOME/.kube/config" -Encoding utf8
 
       - name: Verify kubectl context
         run: |
