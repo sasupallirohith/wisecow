@@ -81,3 +81,4 @@ jobs:
         run: |
           kubectl apply -f k8s/wisecow-deployment.yaml --validate=false
           kubectl apply -f k8s/wisecow-service.yaml --validate=false
+
