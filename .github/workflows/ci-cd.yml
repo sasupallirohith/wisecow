@@ -64,7 +64,7 @@ users:
 - name: ci-cd-service-account
   user:
     token: ${{ secrets.KUBE_TOKEN }}
-EOF
+EOF  # Ensure this is at the start of the line
 
       - name: Verify kubectl context
         run: |
